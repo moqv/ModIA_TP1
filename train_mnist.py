@@ -11,8 +11,14 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 from mnist_net import MNISTNet
+import tensorflow as tf  
+import tensorboard as tb  
+tf.io.gfile = tb.compat.tensorflow_stub.io.gfile
+
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+writer=SummaryWriter(f'runs/MNIST')
 
 def train(net, optimizer, loader, epochs=10):
     criterion = nn.CrossEntropyLoss()
@@ -77,7 +83,7 @@ if __name__=='__main__':
 
   writer = SummaryWriter(f'runs/MNIST')
 
-  train(net, optimizer, trainloader, epochs, writer)
+  train(net, optimizer, trainloader, epochs)
   test_acc = test(net, testloader)
   print(f'Test accuracy:{test_acc}')
   torch.save(net.state_dict(), "mnist_net.pth")
