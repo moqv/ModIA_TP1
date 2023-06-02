@@ -18,9 +18,10 @@ tf.io.gfile = tb.compat.tensorflow_stub.io.gfile
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 writer=SummaryWriter(f'runs/MNIST')
 
-def train(net, optimizer, loader, epochs=10):
+def train(net, optimizer, loader, writer, epochs=10):
     criterion = nn.CrossEntropyLoss()
     for epoch in range(epochs):
         running_loss = []
@@ -34,6 +35,7 @@ def train(net, optimizer, loader, epochs=10):
             loss.backward()
             optimizer.step()
             t.set_description(f'training loss: {mean(running_loss)}')
+        writer.add_scalar('training loss', mean(running_loss), epoch)
 
 def test(model, dataloader):
     test_corrects = 0
@@ -81,9 +83,7 @@ if __name__=='__main__':
   net = net.to(device)
   optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
 
-  writer = SummaryWriter(f'runs/MNIST')
-
-  train(net, optimizer, trainloader, epochs)
+  train(net, optimizer, trainloader, writer, epochs)
   test_acc = test(net, testloader)
   print(f'Test accuracy:{test_acc}')
   torch.save(net.state_dict(), "mnist_net.pth")
